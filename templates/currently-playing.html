@@ -1,0 +1,91 @@
+{% extends "layout.html" %}
+{% block title %}Now Playing{% endblock %}
+{% block head %}
+    {{ super() }}
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/now-playing.css') }}" type="text/css" />
+    <link rel="shortcut icon"
+        href="{{ url_for('static', filename='img/favicon.ico') }}">
+
+    <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+{% endblock %}
+{% block body %}
+<script>
+
+    (function (document) {
+
+        var get_username = function() {
+            // format: #username, or #!/user/username, prompt fallback
+            return document.location.hash.split('/')[2] ||
+                           document.location.hash.substring(1) ||
+                           prompt('Enter a Last.fm username?');
+        };
+
+        $(document).ready(function() {
+            // Canonicalise/Persist hash
+            document.location.hash = username = get_username();
+        });
+
+        var update_now_playing = function() {
+            $.getJSON($SCRIPT_ROOT + '/update_now_playing', {
+                username: username
+            }, function(data) {
+                $("#img").attr('src', data.image),
+                $("#artist").text(data.artist),
+                $("#track").text(data.track),
+                $("#track").attr('href', data.track_url);
+            });
+		};
+
+        setInterval(update_now_playing, 5000);
+
+        // Needs replacing with a cross browser jquery plugin
+        window.onhashchange = function(event) {
+            username = get_username();
+            if (username != np.user) {
+                np.user = username;
+                np.update();
+            }
+        };
+
+    })(document);
+
+    var repeat=1 //enter 0 to not repeat scrolling after 1 run, othersise, enter 1
+    var title = document.getElementById("title");
+    var leng=title.length;
+    var start=1;
+    function titlemove() {
+      titl=title.substring(start, leng) + title.substring(0, start);
+      document.title=titl;
+      start++;
+      if (start==leng+1) {
+        start=0;
+        if (repeat==0)
+            return;
+      }
+      setTimeout("titlemove()",500);
+    }
+    if (document.title)
+        titlemove()
+
+    </script>
+<body>
+    
+    <div id="page" class="inactive">
+        
+        <header id="head">
+            Now Playing
+        </header>
+        
+        <img src= {{ image }} id="img" onclick="document.getElementById('img').style.visibility='hidden'">
+        <article>
+            <h1>
+                <span id="artist">{{ artist }}</span>
+                <span class="separator">&mdash;</span> 
+                <a class="brick" href="#" target="_blank" <span id="track">{{ track }}</span></a>
+            </h1>
+        </article>
+    </div>
+</body>
+{% endblock %}

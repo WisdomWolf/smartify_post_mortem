@@ -1,0 +1,4 @@
+spotipy>=2.3.6
+pylast>=1.2
+flask>=0.10
+flask-oauthlib>=0.9.1

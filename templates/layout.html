@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<title id="title">{% block title %}jQuery Example{% endblock %}</title>
+{% block head %}
+<script type="text/javascript"
+  src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+<script type="text/javascript">
+  var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/now-playing.css') }}" />
+<script src="{{ url_for('static', filename='js/now-playing.js') }}"></script>
+<script src="{{ url_for('static', filename='js/lastfm.js') }}"></script>
+{% endblock %}
+{% block body %}{% endblock %}
+<footer>
+    By <a class="sig" href="http://twitter.com/WisdomWolf">@WisdomWolf</a> on <a href="https://github.com/wisdomwolf/now-playing-radiator">Github</a>
+</footer>
