@@ -10,15 +10,20 @@ import spotipy.util as util
 import sys
 import time
 
-config = ConfigParser()
-config.read('settings.ini')
+if os.path.exists('settings.ini'):
+    config = ConfigParser()
+    config.read('settings.ini')
+
+    env = config['Environment Vars']
+    for k, v in env.items():
+        os.environ[k] = v
 
 # PyLast
-API_KEY = config['Last-FM API']['lastfm_api_key']
-API_SECRET = config['Last-FM API']['lastfm_api_secret']
+API_KEY = os.environ['LASTFM_API_KEY']
+API_SECRET = os.environ['LASTFM_API_SECRET']
 
-lastfm_username = config['LastFM']['Username']
-password_hash = config['LastFM']['Password Hash']
+lastfm_username = os.environ['LASTFM_DEFAULT_USERNAME']
+password_hash = os.environ['LASTFM_DEFAULT_PWHASH']
 
 network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET,
                                username=lastfm_username,
@@ -26,9 +31,6 @@ network = pylast.LastFMNetwork(api_key=API_KEY, api_secret=API_SECRET,
 
 # SpotiPy
 scope = 'playlist-modify-public'
-os.environ['SPOTIPY_CLIENT_ID'] = config['Spotify API']['spotipy_client_id']
-os.environ['SPOTIPY_CLIENT_SECRET'] = config['Spotify API']['spotipy_client_secret']
-os.environ['SPOTIPY_REDIRECT_URI'] = config['Spotify API']['spotipy_callback_url']
 heard_songs = []
 track_total = 0
 
@@ -50,6 +52,7 @@ def show_tracks(tracks, page=0):
 def parse_tracks(tracks, page=0):
     for i, item in enumerate(tracks['items'], start=1):
         track = item['track']
+        pdb.set_trace()
         artist = track['artists'][0]['name']
         name = track['name']
         track_id = track['id']
@@ -97,7 +100,7 @@ if __name__ == '__main__':
         username = sys.argv[1]
     else:
         try:
-            username = config['Spotify']['Username']
+            username = os.environ['SPOTIFY_DEFAULT_USERNAME']
             print('reading username from ini file')
         except:
             print("Usage: %s username" % (sys.argv[0],))
@@ -107,6 +110,7 @@ if __name__ == '__main__':
     token = util.prompt_for_user_token(username, scope)
 
     if token:
+        pdb.set_trace()
         sp = spotipy.Spotify(auth=token)
         start_time = round(time.time())
         playlists = sp.user_playlists(username)
